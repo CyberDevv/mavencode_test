@@ -13,9 +13,11 @@ const Navbar = () => {
         <h5 className="text-xl lg:text-3xl font-bold ">tabler</h5>
 
         <div className="space-x-4 lg:space-x-8 end">
-          <button className="md:block hidden px-2 py-1 lg:px-3 lg:py-1.5 text-xs lg:text-sm font-medium text-blue-600 border border-blue-600 rounded hover:text-white hover:bg-blue-500">
-            Source Code
-          </button>
+          <a href={"https://github.com/CyberDevv/mavencode_test"}>
+            <button className="md:block hidden px-2 py-1 lg:px-3 lg:py-1.5 text-xs lg:text-sm font-medium text-blue-600 border border-blue-600 rounded hover:text-white hover:bg-blue-500">
+              Source Code
+            </button>
+          </a>
 
           <button className="relative">
             <IoIosNotificationsOutline className="lg:text-2xl" />
