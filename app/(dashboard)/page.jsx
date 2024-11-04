@@ -2,55 +2,62 @@
 
 import Card from "@/components/Card";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import DataTable from "@/components/DataTable";
 import { AreaChartComp } from "@/components/AreaChart";
 import { PieChartStyle1 } from "@/components/PIeChart";
 import { PieChartStyle2 } from "@/components/PIeChartStyle2";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { fetchLinkedInDataRequest } from "@/lib/features/linkedInSlice";
 
 export default function Home() {
   const router = useRouter();
+  const dispatch = useDispatch();
 
-  const { details } = useSelector((state) => state.user);
+  const { username, details } = useSelector((state) => state.user);
+  const { profileData, loading, error } = useSelector(
+    (state) => state.linkedIn
+  );
 
   React.useEffect(() => {
-    if (!details) {
+    if (!username) {
       router.push("/login");
     }
-  }, [details, router]);
+  }, [username, router]);
+
+  React.useEffect(() => {
+    dispatch(fetchLinkedInDataRequest(username));
+  }, [dispatch, username]);
+
+  if (loading) return <div className="text-center center">Loading...</div>;
+  if (error && !profileData) return <div>Error: {error}</div>;
+  if (!profileData) return null;
 
   const analytics = [
     {
-      label: "New Tickets",
-      value: details?.analytics?.newTickets?.value,
-      percent: details?.analytics?.newTickets?.percent,
+      label: "New Cases",
+      value: profileData?.["New Cases_text"] || 0,
     },
     {
-      label: "Closed Today",
-      value: details?.analytics?.closedToday?.value,
-      percent: details?.analytics?.closedToday?.percent,
+      label: "New Deaths",
+      value: profileData?.["New Deaths_text"] || 0,
     },
     {
-      label: "New Replies",
-      value: details?.analytics?.newReplies?.value,
-      percent: details?.analytics?.newReplies?.percent,
+      label: "Total Cases",
+      value: profileData?.["Total Cases_text"] || 0,
     },
     {
-      label: "Followers",
-      value: details?.analytics?.followers?.value,
-      percent: details?.analytics?.followers?.percent,
+      label: "Total Deaths",
+      value: profileData?.["Total Deaths_text"] || 0,
     },
     {
-      label: "Daily Earnings",
-      value: details?.analytics?.dailyEarnings?.value,
-      percent: details?.analytics?.dailyEarnings?.percent,
+      label: "Total Recovered",
+      value: profileData?.["Total Recovered_text"] || 0,
     },
     {
-      label: "Products",
-      value: details?.analytics?.products?.value,
-      percent: details?.analytics?.products?.percent,
+      label: "Active Cases",
+      value: profileData?.["Active Cases_text"] || 0,
     },
   ];
 
@@ -83,7 +90,7 @@ export default function Home() {
 
   return (
     <main className="bg-blue-50 min-h-[calc(100vh-129px)] px-4 py-4 lg:px-8 xl:px-16 lg:py-8">
-      <h3 className="text-lg lg:text-2xl font-medium text-gray-600">
+      <h3 className="text-lg font-medium text-gray-600 lg:text-2xl">
         Dashboard
       </h3>
 
@@ -94,31 +101,33 @@ export default function Home() {
               key={idx}
               className="p-4 text-center border border-gray-300 bg-gray-50"
             >
-              <p
-                className={`${
-                  data?.percent?.startsWith("+")
-                    ? " text-green-600 "
-                    : " text-red-600"
-                } text-xs text-green-600 text-end end`}
-              >
-                {data?.percent}%
-                {data?.percent?.startsWith("+") ? (
-                  <IoIosArrowUp />
-                ) : (
-                  <IoIosArrowDown />
-                )}
-              </p>
-              <p className="mt-1 text-2xl lg:text-4xl font-semibold text-gray-500">
+              {data?.percent && (
+                <p
+                  className={`${
+                    data?.percent?.startsWith("+")
+                      ? " text-green-600 "
+                      : " text-red-600"
+                  } text-xs text-green-600 text-end end`}
+                >
+                  {data?.percent}%
+                  {data?.percent?.startsWith("+") ? (
+                    <IoIosArrowUp />
+                  ) : (
+                    <IoIosArrowDown />
+                  )}
+                </p>
+              )}
+              <p className="mt-1 text-2xl font-semibold text-gray-500 lg:text-3xl">
                 {data?.value}
               </p>
-              <p className="pb-1 lg:pb-2 text-sm lg:text-base font-medium text-gray-500">
+              <p className="pb-1 text-sm font-medium text-gray-500 lg:pb-2 lg:text-base">
                 {data?.label}
               </p>
             </div>
           );
         })}
       </div>
-      <div className="grid w-full lg:grid-cols-2 mt-4 lg:mt-10 gap-4">
+      <div className="grid w-full gap-4 mt-4 lg:grid-cols-2 lg:mt-10">
         <Card label="Development Activity">
           <>
             <AreaChartComp chartData={details?.chartData || []} />
@@ -132,7 +141,7 @@ export default function Home() {
             code samples
           </p>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 mt-4 gap-4">
+          <div className="grid gap-4 mt-4 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
             <Card label="Chart Title">
               <PieChartStyle1 chartData={details?.pieoneData || []} />
             </Card>

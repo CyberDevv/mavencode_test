@@ -43,7 +43,7 @@ const pages = [
 const SubNavbar = () => {
   const dispatch = useDispatch();
 
-  const { details } = useSelector((state) => state.user);
+  const { username } = useSelector((state) => state.user);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -52,7 +52,7 @@ const SubNavbar = () => {
   const [active, setActive] = react.useState("Home");
 
   return (
-    <nav className="px-4 lg:px-8 xl:px-16 lg:py-2 space-x-1 lg:space-x-5 start overflow-auto">
+    <nav className="px-4 space-x-1 overflow-auto lg:px-8 xl:px-16 lg:py-2 lg:space-x-5 start">
       {pages.map(({ label, icon }) => {
         return (
           <button
@@ -68,7 +68,7 @@ const SubNavbar = () => {
           </button>
         );
       })}
-      {details && (
+      {username && (
         <button
           className={`text-red-500 px-3 py-1.5 text-xs lg:text-sm font-semibold tracking-wide center space-x-0.5`}
           onClick={handleLogout}
